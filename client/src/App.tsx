@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { fetchMe } from "./redux/authSlice";
 import { useAppDispatch } from "./redux/hooks";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 
 function App() {
   const dispatch = useAppDispatch();
