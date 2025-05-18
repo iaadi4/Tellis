@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["https://tellis-pi.vercel.app", "https://vercel.com/iaadi4s-projects/tellis/AgcPtktiJvE89sgkeXAEeVwiy9YV"],
     credentials: true
 }))
 
