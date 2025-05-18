@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRouter from "./routes/auth.route";
+import taskRouter from "./routes/task.route";
 import { MongoClient } from "mongodb";
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(cors({
 }))
 
 app.use('/api/auth', authRouter);
+app.use('/api/tasks', taskRouter);
 
 const url = process.env.DATABASE_URL!;
 const client = new MongoClient(url);
