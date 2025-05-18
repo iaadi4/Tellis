@@ -24,8 +24,8 @@ async function login(req: Request, res: Response): Promise<void> {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
         res.cookie("access_token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
         res.status(StatusCodes.SUCCESS).json({
