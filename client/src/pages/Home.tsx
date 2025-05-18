@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { CheckCircle, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,10 +37,16 @@ interface Task {
   updatedAt: string;
 }
 
+const taskSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters").max(100, "Name cannot exceed 100 characters"),
+  description: z.string().min(5, "Description must be at least 5 characters").max(500, "Description cannot exceed 500 characters"),
+});
+
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [taskForm, setTaskForm] = useState({ name: "", description: "" });
+  const [formErrors, setFormErrors] = useState<{ name?: string; description?: string }>({});
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -86,9 +93,37 @@ export default function HomePage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setTaskForm({ ...taskForm, [e.target.name]: e.target.value });
+    
+    // Clear error when user starts typing
+    if (formErrors[e.target.name as keyof typeof formErrors]) {
+      setFormErrors({
+        ...formErrors,
+        [e.target.name]: undefined
+      });
+    }
+  };
+
+  const validateForm = () => {
+    try {
+      taskSchema.parse(taskForm);
+      setFormErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: { name?: string; description?: string } = {};
+        error.errors.forEach((err) => {
+          const path = err.path[0] as keyof typeof formErrors;
+          errors[path] = err.message;
+        });
+        setFormErrors(errors);
+      }
+      return false;
+    }
   };
 
   const handleCreateTask = async () => {
+    if (!validateForm()) return;
+
     try {
       const res = await fetch("http://localhost:5000/api/tasks", {
         method: "POST",
@@ -120,6 +155,7 @@ export default function HomePage() {
 
   const handleUpdateTask = async () => {
     if (!currentTask) return;
+    if (!validateForm()) return;
 
     try {
       const res = await fetch(`http://localhost:5000/api/tasks/${currentTask.id}`, {
@@ -182,6 +218,7 @@ export default function HomePage() {
   const openUpdateDialog = (task: Task) => {
     setCurrentTask(task);
     setTaskForm({ name: task.name, description: task.description });
+    setFormErrors({});
     setIsUpdateDialogOpen(true);
   };
 
@@ -247,6 +284,9 @@ export default function HomePage() {
                     onChange={handleChange}
                     placeholder="Enter task name" 
                   />
+                  {formErrors.name && (
+                    <p className="text-sm text-red-500 mt-1">{formErrors.name}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="task-description">Description</Label>
@@ -258,6 +298,9 @@ export default function HomePage() {
                     placeholder="Enter task description"
                     rows={4}
                   />
+                  {formErrors.description && (
+                    <p className="text-sm text-red-500 mt-1">{formErrors.description}</p>
+                  )}
                 </div>
               </div>
               <DialogFooter>
@@ -267,7 +310,6 @@ export default function HomePage() {
                 <Button 
                   className="bg-indigo-600 hover:bg-indigo-500"
                   onClick={handleCreateTask}
-                  disabled={!taskForm.name || !taskForm.description}
                 >
                   Create Task
                 </Button>
@@ -353,6 +395,9 @@ export default function HomePage() {
                   onChange={handleChange}
                   placeholder="Enter task name" 
                 />
+                {formErrors.name && (
+                  <p className="text-sm text-red-500 mt-1">{formErrors.name}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="update-task-description">Description</Label>
@@ -364,6 +409,9 @@ export default function HomePage() {
                   placeholder="Enter task description"
                   rows={4}
                 />
+                {formErrors.description && (
+                  <p className="text-sm text-red-500 mt-1">{formErrors.description}</p>
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -373,7 +421,6 @@ export default function HomePage() {
               <Button 
                 className="bg-indigo-600 hover:bg-indigo-500"
                 onClick={handleUpdateTask}
-                disabled={!taskForm.name || !taskForm.description}
               >
                 Update Task
               </Button>
