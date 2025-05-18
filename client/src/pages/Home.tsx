@@ -55,7 +55,7 @@ export default function HomePage() {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/tasks", {
+      const res = await fetch("https://tellis.onrender.com/api/tasks", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +94,6 @@ export default function HomePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setTaskForm({ ...taskForm, [e.target.name]: e.target.value });
     
-    // Clear error when user starts typing
     if (formErrors[e.target.name as keyof typeof formErrors]) {
       setFormErrors({
         ...formErrors,
@@ -125,7 +124,7 @@ export default function HomePage() {
     if (!validateForm()) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/tasks", {
+      const res = await fetch("https://tellis.onrender.com/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +157,7 @@ export default function HomePage() {
     if (!validateForm()) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/tasks/${currentTask.id}`, {
+      const res = await fetch(`https://tellis.onrender.com/api/tasks/${currentTask.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -189,7 +188,7 @@ export default function HomePage() {
     if (!currentTask) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/tasks/${currentTask.id}`, {
+      const res = await fetch(`https://tellis.onrender.com/api/tasks/${currentTask.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -228,7 +227,7 @@ export default function HomePage() {
   };
 
   const handleLogout = async () => {
-    await fetch('http://localhost:5000/api/auth/logout');
+    await fetch('https://tellis.onrender.com/api/auth/logout');
     toast.success("Logged out successfully");
     navigate("/login");
   };

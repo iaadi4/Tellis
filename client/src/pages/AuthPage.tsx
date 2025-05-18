@@ -81,7 +81,7 @@ export default function AuthPage({ type }: AuthPageProps) {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/${isLogin ? "login" : "register"}`, {
+      const res = await fetch(`https://tellis.onrender.com/api/auth/${isLogin ? "login" : "register"}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
