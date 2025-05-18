@@ -24,8 +24,8 @@ async function login(req: Request, res: Response): Promise<void> {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
         res.cookie("access_token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: false,
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
         res.status(StatusCodes.SUCCESS).json({
@@ -99,7 +99,6 @@ export async function me(req: Request, res: Response): Promise<void> {
                 data: {}
             });
         }
-
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
         const user = await prisma.user.findFirst({
             where: {
